@@ -67,8 +67,8 @@ function mergeDirectory(sourcePath: string, targetPath: string) {
   io.rmRF(targetPath);
   // copy source path to target path
   const parentPath = path.dirname(targetPath);
-  io.cp(path.join(sourcePath, 'templates'), parentPath, { recursive : true, force: true });
-  core.info(`Replace ${targetPath} by ${sourcePath}/templates`);
+  io.cp(sourcePath, parentPath, { recursive : true, force: true });
+  core.info(`Replace ${targetPath} by ${sourcePath}`);
 }
 
 async function run() {

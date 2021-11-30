@@ -5,8 +5,8 @@ type TopItem = {
   isNonBlock: boolean;
 };
 
-const startBlockPattern = /^#.*BEGIN\s+.*([\w-]+).*$/i;
-const endBlockPattern = /^#+.*END\s+.*([\w-]+).*$/i;
+const startBlockPattern = /^#+.*BEGIN.* +([\w-]+).*$/i;
+const endBlockPattern = /^#+.*END.* +([\w-]+).*$/
 
 export function locateRootKeyRanges(lines: string[]): TopItem[] {
   const topItems: TopItem[] = [];

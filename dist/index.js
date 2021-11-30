@@ -98,8 +98,8 @@ function mergeDirectory(sourcePath, targetPath) {
     io.rmRF(targetPath);
     // copy source path to target path
     const parentPath = path.dirname(targetPath);
-    io.cp(path.join(sourcePath, 'templates'), parentPath, { recursive: true, force: true });
-    core.info(`Replace ${targetPath} by ${sourcePath}/templates`);
+    io.cp(sourcePath, parentPath, { recursive: true, force: true });
+    core.info(`Replace ${targetPath} by ${sourcePath}`);
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -139,8 +139,8 @@ run();
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.locateRootKeyRanges = void 0;
-const startBlockPattern = /^#.*BEGIN\s+.*([\w-]+).*$/i;
-const endBlockPattern = /^#+.*END\s+.*([\w-]+).*$/i;
+const startBlockPattern = /^#+.*BEGIN.* +([\w-]+).*$/i;
+const endBlockPattern = /^#+.*END.* +([\w-]+).*$/;
 function locateRootKeyRanges(lines) {
     const topItems = [];
     let currentTopItem = null;
