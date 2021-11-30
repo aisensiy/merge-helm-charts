@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import * as io from "@actions/io";
 import * as fs from "fs";
 import * as path from "path";
+import * as utils from "./utils";
 import { inspect } from "util";
 
 import mergeStrings from "./merge-values-by-comments";
@@ -15,7 +16,7 @@ function readYamlFileIgnorePostfix(filePath: string, ignoreNotFound: boolean = t
   const condidateFilePaths = [`${filePathWithoutPostfix}.yml`, `${filePathWithoutPostfix}.yaml`];
   for (const condidateFilePath of condidateFilePaths) {
     if (fs.existsSync(condidateFilePath)) {
-      return fs.readFileSync(condidateFilePath, "utf8");
+      return condidateFilePath;
     }
   }
 
@@ -60,10 +61,22 @@ function mergeFile(sourceFilePath: string, targetFilePath: string) {
   }
 }
 
+
+function mergeDirectory(sourcePath: string, targetPath: string) {
+  // remove files in destination path
+  io.rmRF(targetPath);
+  // copy source path to target path
+  const parentPath = path.dirname(targetPath);
+  io.cp(path.join(sourcePath, 'templates'), parentPath, { recursive : true, force: true });
+  core.info(`Replace ${targetPath} by ${sourcePath}/templates`);
+}
+
 async function run() {
   const inputs = {
     sourcePath: core.getInput("source-path"),
     destinationPath: core.getInput("destination-path"),
+    mergeYamls: utils.getInputAsArray("merge-yamls"),
+    mergeDirectories: utils.getInputAsArray("merge-directories"),
   };
   core.debug(`Inputs: ${inspect(inputs)}`);
 
@@ -71,20 +84,15 @@ async function run() {
   const sourcePath = inputs.sourcePath;
   const destinationPath = inputs.destinationPath;
   if (fs.existsSync(sourcePath)) {
-    // remove files in destination path
-    io.rmRF(path.join(destinationPath, "templates"));
-    // copy source path to destination path
-    io.cp(path.join(sourcePath, 'templates'), destinationPath, { recursive : true, force: true });
-    core.info(`Replace ${destinationPath}/templates to ${sourcePath}/templates`);
+    for (const directory of inputs.mergeDirectories) {
+      mergeDirectory(path.join(sourcePath, directory), path.join(destinationPath, directory));
+    }
 
-    // merge files
-    const sourceFilePath = path.join(sourcePath, "values.yaml");
-    const targetFilePath = path.join(destinationPath, "values.yaml");
-    mergeFile(readYamlFileIgnorePostfix(sourceFilePath), readYamlFileIgnorePostfix(targetFilePath));
-
-    const sourceFilePath2 = path.join(sourcePath, "questions.yaml");
-    const targetFilePath2 = path.join(destinationPath, "values.yaml.template");
-    mergeFile(readYamlFileIgnorePostfix(sourceFilePath2), readYamlFileIgnorePostfix(targetFilePath2));
+    for (const yaml of inputs.mergeYamls) {
+      const sourceFilePath = readYamlFileIgnorePostfix(path.join(sourcePath, yaml));
+      const targetFilePath = path.join(destinationPath, yaml);
+      mergeFile(readYamlFileIgnorePostfix(sourceFilePath), readYamlFileIgnorePostfix(targetFilePath));
+    }
   } else {
     core.info(`Source path ${sourcePath} does not exist`);
   }

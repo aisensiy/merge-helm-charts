@@ -1,12 +1,11 @@
-# Update Postman Schema from File
+# Merge Helm Charts
 
 A GitHub action to merge helm chart content from one directory to another.
 
-Right now only three parts will be handled:
+Right now two types of items can be merge:
 
-- `templates/`: all the templates contents in target will be replaced by source/templates
-- `values.yaml|yml`: will be merged be rule of comment blocks
-- `questions.yaml|yml`: will be merged be rule of comment blocks
+- `yaml file`: will be merged be rule of comment blocks
+- `directory`: will be replaced by the source directory
 
 ## Usage
 
@@ -15,6 +14,8 @@ Right now only three parts will be handled:
         with:
           source-path: "source/helm-charts"
           destination-path: "target/helm-charts"
+          merge-yamls: "values.yaml,questions.yaml"
+          merge-directories: "templates/openbayes_console"
 ```
 
 ### Action inputs
@@ -23,6 +24,8 @@ Right now only three parts will be handled:
 | --- | --- | --- |
 | `source-path` | (**required**) Source path of helm charts. | |
 | `destination-path` | (**required**) Target path of helm charts. | |
+| `merge-yamls` | (**required**) Target yaml files, separate by comma or newline. | values.yaml |
+| `merge-directories` | (**required**) Target directories, separate by comma or newline. | |
 
 ### Outputs
 

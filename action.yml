@@ -7,6 +7,13 @@ inputs:
   destination-path:
     description: 'Destination chart folder'
     required: true
+  merge-yamls:
+    description: 'Yaml file to be merged, separate by comma or newline'
+    required: false
+    default: "values.yaml"
+  merge-directories:
+    description: 'Directories to be replaced, separate by comma or newline'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -42,6 +42,7 @@ const core = __importStar(__nccwpck_require__(186));
 const io = __importStar(__nccwpck_require__(436));
 const fs = __importStar(__nccwpck_require__(747));
 const path = __importStar(__nccwpck_require__(622));
+const utils = __importStar(__nccwpck_require__(918));
 const util_1 = __nccwpck_require__(669);
 const merge_values_by_comments_1 = __importDefault(__nccwpck_require__(978));
 function readYamlFileIgnorePostfix(filePath, ignoreNotFound = true) {
@@ -52,7 +53,7 @@ function readYamlFileIgnorePostfix(filePath, ignoreNotFound = true) {
     const condidateFilePaths = [`${filePathWithoutPostfix}.yml`, `${filePathWithoutPostfix}.yaml`];
     for (const condidateFilePath of condidateFilePaths) {
         if (fs.existsSync(condidateFilePath)) {
-            return fs.readFileSync(condidateFilePath, "utf8");
+            return condidateFilePath;
         }
     }
     if (ignoreNotFound) {
@@ -92,29 +93,35 @@ function mergeFile(sourceFilePath, targetFilePath) {
         core.info(`Merged ${sourceFilePath} to ${targetFilePath}`);
     }
 }
+function mergeDirectory(sourcePath, targetPath) {
+    // remove files in destination path
+    io.rmRF(targetPath);
+    // copy source path to target path
+    const parentPath = path.dirname(targetPath);
+    io.cp(path.join(sourcePath, 'templates'), parentPath, { recursive: true, force: true });
+    core.info(`Replace ${targetPath} by ${sourcePath}/templates`);
+}
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const inputs = {
             sourcePath: core.getInput("source-path"),
             destinationPath: core.getInput("destination-path"),
+            mergeYamls: utils.getInputAsArray("merge-yamls"),
+            mergeDirectories: utils.getInputAsArray("merge-directories"),
         };
         core.debug(`Inputs: ${util_1.inspect(inputs)}`);
         // if source path exists copy templates folder to destination path
         const sourcePath = inputs.sourcePath;
         const destinationPath = inputs.destinationPath;
         if (fs.existsSync(sourcePath)) {
-            // remove files in destination path
-            io.rmRF(path.join(destinationPath, "templates"));
-            // copy source path to destination path
-            io.cp(path.join(sourcePath, 'templates'), destinationPath, { recursive: true, force: true });
-            core.info(`Replace ${destinationPath}/templates to ${sourcePath}/templates`);
-            // merge files
-            const sourceFilePath = path.join(sourcePath, "values.yaml");
-            const targetFilePath = path.join(destinationPath, "values.yaml");
-            mergeFile(readYamlFileIgnorePostfix(sourceFilePath), readYamlFileIgnorePostfix(targetFilePath));
-            const sourceFilePath2 = path.join(sourcePath, "questions.yaml");
-            const targetFilePath2 = path.join(destinationPath, "values.yaml.template");
-            mergeFile(readYamlFileIgnorePostfix(sourceFilePath2), readYamlFileIgnorePostfix(targetFilePath2));
+            for (const directory of inputs.mergeDirectories) {
+                mergeDirectory(path.join(sourcePath, directory), path.join(destinationPath, directory));
+            }
+            for (const yaml of inputs.mergeYamls) {
+                const sourceFilePath = readYamlFileIgnorePostfix(path.join(sourcePath, yaml));
+                const targetFilePath = path.join(destinationPath, yaml);
+                mergeFile(readYamlFileIgnorePostfix(sourceFilePath), readYamlFileIgnorePostfix(targetFilePath));
+            }
         }
         else {
             core.info(`Source path ${sourcePath} does not exist`);
@@ -245,6 +252,47 @@ function mergeStrings(sources, targets) {
     return mergedLines;
 }
 exports.default = mergeStrings;
+
+
+/***/ }),
+
+/***/ 918:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getStringAsArray = exports.getInputAsArray = void 0;
+const core = __importStar(__nccwpck_require__(186));
+function getInputAsArray(name, options) {
+    return getStringAsArray(core.getInput(name, options));
+}
+exports.getInputAsArray = getInputAsArray;
+function getStringAsArray(str) {
+    return str
+        .split(/[\n,]+/)
+        .map(s => s.trim())
+        .filter(x => x !== '');
+}
+exports.getStringAsArray = getStringAsArray;
 
 
 /***/ }),
