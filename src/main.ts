@@ -56,7 +56,7 @@ function mergeFile(sourceFilePath: string, targetFilePath: string) {
     // merge lines
     const mergedLines = mergeStrings(sourceLines, destinationLines);
     // write merged lines to destination file
-    fs.writeFileSync(targetFilePath, mergedLines.join("\n") + "\n");
+    fs.writeFileSync(targetFilePath, mergedLines.join("\n"));
     core.info(`Merged ${sourceFilePath} to ${targetFilePath}`);
   }
 }
