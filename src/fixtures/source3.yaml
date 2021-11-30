@@ -1,0 +1,9 @@
+# BEGIN a
+- name: a
+  value: a
+# END a
+
+# BEGIN b
+- name: b
+  value: b
+# END b

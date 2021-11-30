@@ -1,0 +1,15 @@
+global:
+  a: 1
+  b: 2
+  c: 3
+
+questions:
+# BEGIN a
+- name: a
+  value: a
+# END a
+
+# BEGIN b
+- name: b
+  value: b
+# END b

@@ -1,0 +1,263 @@
+global:
+  host: ""
+  enbaledTLS: false
+  # tlsSecretName: "openbayes-com-tls"
+
+url:
+  host: ""
+  s3Prefix: "s3" ## MUST BE isHTTPS: true
+  isHTTPS: false
+  frontend: /console
+  backend: /api
+  storage: /storages
+
+imageCredentials:
+  registry: "uhub.service.ucloud.cn"
+  username: ""
+  password: ""
+  email: ""
+
+databaseCredientials:
+  mysql_host: openbayes-mysql-master.infra
+  mysql_user: ""
+  mysql_password: ""
+
+apidocCredientials:
+  username: ""
+  password: ""
+
+openbayesConfig:
+  JWT_SECRET: ""
+
+# nfs:
+  # persistentVolumeClaim:
+  #   claimName: cephfs-pvc
+  
+  # flexVolume:
+  #   driver: ceph.rook.io/rook
+  #   fsType: ceph
+  #   options:
+  #     fsName: myfs
+  #     clusterNamespace: rook-ceph
+
+openbayes_api_server:
+  
+  deployment:
+    replicas: 1
+    imagePullPolicy: IfNotPresent
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    resources: {}
+      # limits:
+      #  cpu: 100m
+      #  memory: 128Mi
+      # requests:
+      #  cpu: 100m
+      #  memory: 128Mi
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+    nodeSelector: {}
+    ## Affinity for pod assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #   - labelSelector:
+    #       matchExpressions:
+    #       - key: app
+    #         operator: In
+    #         values:
+    #         - loki
+    #     topologyKey: "kubernetes.io/hostname"
+    ## Assign a PriorityClassName to pods if set
+    priorityClassName: ""
+
+  configmap:
+    data:
+      ## If allow register without invitation code
+      ALLOW_REGISTER_WITHOUT_INVITATION: "false"
+      ## Use internal runtimes if empty
+      EXTERNAL_RUNTIMES: ""
+      ## Overwrite internal runtimes, labels BY DEFAULT include "MACHINE_LEARNING"
+      # EXTERNAL_RUNTIMES: |
+      #   runtimes:
+      #     list:
+      #       - framework: "tensorflow"
+      #         version: "2.3"
+      #         device: "CPU"
+      #         image: "openbayesruntimes/tensorflow:2.3.1-py36-cpu.58"
+      #         type: "JOB"
+      #         labels: ["MACHINE_LEARNING"]
+      #       - framework: "tensorflow"
+      #         version: "1.15"
+      #         device: "CPU"
+      #         image: "openbayesruntimes/tensorflow:1.15.0-py36-cpu.63"
+      #         defaultValue: true
+      #         type: "JOB"
+      #       - framework: "pytorch"
+      #         version: "1.9.0"
+      #         device: "CPU"
+      #         image: "openbayesruntimes/pytorch:1.9.0-py36-cpu.64"
+      #         type: "JOB"
+
+      ## Validation time of use login token, default is 30 days
+      # JWT_SESSIONTIME: "2592000"
+
+      ## Prefix of runtimes
+      # RUNTIME_REGISTRY: uhub.service.ucloud.cn
+
+      ## If set, the api server will use redis rate limit feature
+      # RATELIMIT_ENABLE: "false"
+
+      ## Access information for redis, necessary if RATELIMIT_ENABLE is "true"
+      # SPRING_REDIS_HOST: redis-master.infra
+      # SPRING_REDIS_PASSWORD: redispassword
+
+      ## Url of storage service
+      # STORAGE_BASE_URL: /storages
+
+      ## Configuration of object service for image storage
+      # UFILE_BUCKET: openbayes-dev
+      # UFILE_END_POINT: http://s3-cn-bj.ufileos.com
+
+  admin:
+    ## Generate a jwt token for use "admin" without expired time, used by system service
+    OPENBAYES_TOKEN: ""
+
+  databaseCredientials:
+    mysql_db: openbayes
+    ## Override the global mysql username and password
+    # mysql_user: ""
+    # mysql_password: ""
+
+  secret:
+    data:
+    ## Configuration of object service for image storage
+    # UFILE_PRIVATE_KEY: ""
+    # UFILE_PUBLIC_KEY: ""
+
+openbayes_apidoc:
+
+  enabled: false
+
+  deployment:
+    imagePullPolicy: IfNotPresent
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    resources: {}
+      # limits:
+      #  cpu: 100m
+      #  memory: 128Mi
+      # requests:
+      #  cpu: 100m
+    #  memory: 128Mi
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+    nodeSelector: {}
+    ## Affinity for pod assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #   - labelSelector:
+    #       matchExpressions:
+    #       - key: app
+    #         operator: In
+    #         values:
+    #         - loki
+    #     topologyKey: "kubernetes.io/hostname"
+    ## Assign a PriorityClassName to pods if set
+    priorityClassName: ""
+
+openbayes_archive_service:
+  
+  deployment:
+    imagePullPolicy: IfNotPresent
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    resources: {}
+      # limits:
+      #  cpu: 100m
+      #  memory: 128Mi
+      # requests:
+      #  cpu: 100m
+      #  memory: 128Mi
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+    nodeSelector: {}
+    ## Affinity for pod assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    affinity: {}
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #   - labelSelector:
+    #       matchExpressions:
+    #       - key: app
+    #         operator: In
+    #         values:
+    #         - loki
+    #     topologyKey: "kubernetes.io/hostname"
+    ## Assign a PriorityClassName to pods if set
+    priorityClassName: ""
+
+  s3_backup_credentials:
+    # AWS_ACCESS_KEY_ID: ""
+    # AWS_SECRET_ACCESS_KEY: ""
+    # AWS_BUCKET_NAME: openbayes-backups
+    # AWS_ENDPOINT: ""
+    # AWS_REGION: xxx-signing-region
+    # AWS_STORAGE_CLASS: ONEZONE_IA
+
+  configmap:
+    data:
+      ## 是否开启备份
+      ENABLE_BACKUP: "false"
+
+      ## 备份模式，s3 或 "" (指定 STORAGE_BACKUP_PATH)
+      # BACKUP_MODE: s3
+
+      ## 备份地址
+      STORAGE_BACKUP_PATH: ""
+
+      ## nfs 地址
+      STORAGE_NFS_PATH: "/nfs"
+
+      ## 处理备份的压缩包地址
+      STORAGE_ARCHIVE_PATH: "/nfs/archive"
+
+      ## 临时目录地址
+      STORAGE_TEMP_PATH: "/storage/tmp"
+
+      ## 处理恢复的压缩包地址
+      STORAGE_RECOVERY_PATH: "/storage/recovery"
+
+      ## 是否开启调试模式
+      # DEBUG_MODE: "false"
+
+      ## 服务执行的等待周期 (秒)
+      # INTERVAL: "600"
+
+      ## 是否开启恢复模式
+      # RESTORE_MODE: "false"
+
+      ## 恢复文件的覆盖模式，"skip" 或 "replace"
+      # RESTORE_TYPE: skip
+
+      ## 删除文件保留时间 (天)
+      # DAY_FOR_DELETE: 30
+
+      ## 限制同步速度 (KB/s)
+      # RSYNC_SPEED_LIMIT: "50000"
+
+      ## 备份使用的压缩包名
+      # ARCHIVE_ZIP_NAME: "Archive.zip"
+
+      ## 不进行备份及恢复的用户名单 (用逗号分割)
+      # USER_BLACK_LIST: openbayes
+
+      ## 不进行备份及恢复的数据集或容器名单 (用逗号分割)
+      # DATASET_OR_GEAR_BLACK_LIST: ""
+
+      ## 不进行备份及恢复的用户组名单 (用逗号分割)
+      # GROUP_BLACK_LIST: ""
+
+  persistence:
+    enabled: false
+    # storageClassName: "-"
+    # accessMode: "ReadWriteOnce"
+    # size: 1Gi
+    # volumeMode: Filesystem
