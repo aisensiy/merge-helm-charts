@@ -6,7 +6,7 @@ type TopItem = {
 };
 
 const startBlockPattern = /^#+.*BEGIN.* +([\w-]+).*$/i;
-const endBlockPattern = /^#+.*END.* +([\w-]+).*$/
+const endBlockPattern = /^#+.*END.* +([\w-]+).*$/;
 
 export function locateRootKeyRanges(lines: string[]): TopItem[] {
   const topItems: TopItem[] = [];
@@ -16,7 +16,7 @@ export function locateRootKeyRanges(lines: string[]): TopItem[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmedLine = line.replace(/\s+$/, "");
-    // match end block 
+    // match end block
     const endBlockMatch = endBlockPattern.exec(trimmedLine);
     if (endBlockMatch) {
       if (!currentTopItem) {
@@ -41,7 +41,7 @@ export function locateRootKeyRanges(lines: string[]): TopItem[] {
         name: startBlockMatch[1],
         lineRange: [i, i],
         lines: [],
-        isNonBlock: false
+        isNonBlock: false,
       };
       continue;
     }
@@ -52,10 +52,9 @@ export function locateRootKeyRanges(lines: string[]): TopItem[] {
         name: "",
         lineRange: [i, i],
         lines: [],
-        isNonBlock: true
+        isNonBlock: true,
       };
     }
-
   }
 
   // if there is a current top item, add it to the list
@@ -124,7 +123,6 @@ export default function mergeStrings(
       mergedItems.push(sourceKeys.get(key)!);
     }
   }
-
 
   // merge lines
   const mergedLines: string[] = [];

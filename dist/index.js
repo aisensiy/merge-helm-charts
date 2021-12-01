@@ -50,7 +50,10 @@ function readYamlFileIgnorePostfix(filePath, ignoreNotFound = true) {
     const postfix = path.extname(filePath);
     // remove postfix
     const filePathWithoutPostfix = filePath.slice(0, -postfix.length);
-    const condidateFilePaths = [`${filePathWithoutPostfix}.yml`, `${filePathWithoutPostfix}.yaml`];
+    const condidateFilePaths = [
+        `${filePathWithoutPostfix}.yml`,
+        `${filePathWithoutPostfix}.yaml`,
+    ];
     for (const condidateFilePath of condidateFilePaths) {
         if (fs.existsSync(condidateFilePath)) {
             return condidateFilePath;
@@ -89,7 +92,7 @@ function mergeFile(sourceFilePath, targetFilePath) {
         // merge lines
         const mergedLines = merge_values_by_comments_1.default(sourceLines, destinationLines);
         // write merged lines to destination file
-        fs.writeFileSync(targetFilePath, mergedLines.join("\n") + "\n");
+        fs.writeFileSync(targetFilePath, mergedLines.join("\n").trim() + "\n");
         core.info(`Merged ${sourceFilePath} to ${targetFilePath}`);
     }
 }
@@ -147,7 +150,7 @@ function locateRootKeyRanges(lines) {
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const trimmedLine = line.replace(/\s+$/, "");
-        // match end block 
+        // match end block
         const endBlockMatch = endBlockPattern.exec(trimmedLine);
         if (endBlockMatch) {
             if (!currentTopItem) {
@@ -172,7 +175,7 @@ function locateRootKeyRanges(lines) {
                 name: startBlockMatch[1],
                 lineRange: [i, i],
                 lines: [],
-                isNonBlock: false
+                isNonBlock: false,
             };
             continue;
         }
@@ -182,7 +185,7 @@ function locateRootKeyRanges(lines) {
                 name: "",
                 lineRange: [i, i],
                 lines: [],
-                isNonBlock: true
+                isNonBlock: true,
             };
         }
     }
@@ -289,8 +292,8 @@ exports.getInputAsArray = getInputAsArray;
 function getStringAsArray(str) {
     return str
         .split(/[\n,]+/)
-        .map(s => s.trim())
-        .filter(x => x !== '');
+        .map((s) => s.trim())
+        .filter((x) => x !== "");
 }
 exports.getStringAsArray = getStringAsArray;
 

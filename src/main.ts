@@ -7,13 +7,18 @@ import { inspect } from "util";
 
 import mergeStrings from "./merge-values-by-comments";
 
-
-function readYamlFileIgnorePostfix(filePath: string, ignoreNotFound: boolean = true): string {
+function readYamlFileIgnorePostfix(
+  filePath: string,
+  ignoreNotFound: boolean = true
+): string {
   // get postfix of file
   const postfix = path.extname(filePath);
   // remove postfix
   const filePathWithoutPostfix = filePath.slice(0, -postfix.length);
-  const condidateFilePaths = [`${filePathWithoutPostfix}.yml`, `${filePathWithoutPostfix}.yaml`];
+  const condidateFilePaths = [
+    `${filePathWithoutPostfix}.yml`,
+    `${filePathWithoutPostfix}.yaml`,
+  ];
   for (const condidateFilePath of condidateFilePaths) {
     if (fs.existsSync(condidateFilePath)) {
       return condidateFilePath;
@@ -27,7 +32,6 @@ function readYamlFileIgnorePostfix(filePath: string, ignoreNotFound: boolean = t
   }
 }
 
-  
 function mergeFile(sourceFilePath: string, targetFilePath: string) {
   // if source file does not exist
   const hasSourceFile = fs.existsSync(sourceFilePath);
@@ -39,9 +43,7 @@ function mergeFile(sourceFilePath: string, targetFilePath: string) {
     return;
   }
   if (!hasSourceFile) {
-    core.info(
-      `Keep ${targetFilePath} unchanged or ignore if not exists`
-    );
+    core.info(`Keep ${targetFilePath} unchanged or ignore if not exists`);
     return;
   }
   if (hasSourceFile && hasDestinationFile) {
@@ -56,18 +58,17 @@ function mergeFile(sourceFilePath: string, targetFilePath: string) {
     // merge lines
     const mergedLines = mergeStrings(sourceLines, destinationLines);
     // write merged lines to destination file
-    fs.writeFileSync(targetFilePath, mergedLines.join("\n"));
+    fs.writeFileSync(targetFilePath, mergedLines.join("\n").trim() + "\n");
     core.info(`Merged ${sourceFilePath} to ${targetFilePath}`);
   }
 }
-
 
 function mergeDirectory(sourcePath: string, targetPath: string) {
   // remove files in destination path
   io.rmRF(targetPath);
   // copy source path to target path
   const parentPath = path.dirname(targetPath);
-  io.cp(sourcePath, parentPath, { recursive : true, force: true });
+  io.cp(sourcePath, parentPath, { recursive: true, force: true });
   core.info(`Replace ${targetPath} by ${sourcePath}`);
 }
 
@@ -85,13 +86,21 @@ async function run() {
   const destinationPath = inputs.destinationPath;
   if (fs.existsSync(sourcePath)) {
     for (const directory of inputs.mergeDirectories) {
-      mergeDirectory(path.join(sourcePath, directory), path.join(destinationPath, directory));
+      mergeDirectory(
+        path.join(sourcePath, directory),
+        path.join(destinationPath, directory)
+      );
     }
 
     for (const yaml of inputs.mergeYamls) {
-      const sourceFilePath = readYamlFileIgnorePostfix(path.join(sourcePath, yaml));
+      const sourceFilePath = readYamlFileIgnorePostfix(
+        path.join(sourcePath, yaml)
+      );
       const targetFilePath = path.join(destinationPath, yaml);
-      mergeFile(readYamlFileIgnorePostfix(sourceFilePath), readYamlFileIgnorePostfix(targetFilePath));
+      mergeFile(
+        readYamlFileIgnorePostfix(sourceFilePath),
+        readYamlFileIgnorePostfix(targetFilePath)
+      );
     }
   } else {
     core.info(`Source path ${sourcePath} does not exist`);

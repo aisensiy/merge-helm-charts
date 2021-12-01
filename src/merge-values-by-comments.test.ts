@@ -20,7 +20,9 @@ function testMergeStrings(
 
 describe("locat top ranges", () => {
   it("should locate top ranges", () => {
-    const items = locateRootKeyRanges(fs.readFileSync("./src/fixtures/source3.yaml", "utf8").split("\n"));
+    const items = locateRootKeyRanges(
+      fs.readFileSync("./src/fixtures/source3.yaml", "utf8").split("\n")
+    );
     expect(items.length).toEqual(4);
   });
 });
