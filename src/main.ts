@@ -96,11 +96,10 @@ async function run() {
       const sourceFilePath = readYamlFileIgnorePostfix(
         path.join(sourcePath, yaml)
       );
-      const targetFilePath = path.join(destinationPath, yaml);
-      mergeFile(
-        readYamlFileIgnorePostfix(sourceFilePath),
-        readYamlFileIgnorePostfix(targetFilePath)
+      const targetFilePath = readYamlFileIgnorePostfix(
+        path.join(destinationPath, yaml)
       );
+      mergeFile(sourceFilePath, targetFilePath);
     }
   } else {
     core.info(`Source path ${sourcePath} does not exist`);

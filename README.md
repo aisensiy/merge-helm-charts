@@ -24,8 +24,8 @@ Right now two types of items can be merge:
 | --- | --- | --- |
 | `source-path` | (**required**) Source path of helm charts. | |
 | `destination-path` | (**required**) Target path of helm charts. | |
-| `merge-yamls` | (**required**) Target yaml files, separate by comma or newline. | values.yaml |
-| `merge-directories` | (**required**) Target directories, separate by comma or newline. | |
+| `merge-yamls` | Yaml files to be merged, separate by comma or newline. | values.yaml |
+| `merge-directories` | Directories to be replaced, separate by comma or newline. | |
 
 ### Outputs
 
