@@ -10,7 +10,7 @@ Right now two types of items can be merge:
 ## Usage
 
 ```yml
-      - uses: aisensiy/merge-helm-charts
+      - uses: aisensiy/merge-helm-charts@v1
         with:
           source-path: "source/helm-charts"
           destination-path: "target/helm-charts"

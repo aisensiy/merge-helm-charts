@@ -1,6 +1,6 @@
 {
   "name": "merge-helm-charts",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "An action to merge helm charts",
   "main": "dist/index.js",
   "scripts": {
