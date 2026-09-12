@@ -9,7 +9,7 @@ import mergeStrings from "./merge-values-by-comments";
 
 function readYamlFileIgnorePostfix(
   filePath: string,
-  ignoreNotFound: boolean = true
+  ignoreNotFound: boolean = true,
 ): string {
   // get postfix of file
   const postfix = path.extname(filePath);
@@ -88,16 +88,16 @@ async function run() {
     for (const directory of inputs.mergeDirectories) {
       mergeDirectory(
         path.join(sourcePath, directory),
-        path.join(destinationPath, directory)
+        path.join(destinationPath, directory),
       );
     }
 
     for (const yaml of inputs.mergeYamls) {
       const sourceFilePath = readYamlFileIgnorePostfix(
-        path.join(sourcePath, yaml)
+        path.join(sourcePath, yaml),
       );
       const targetFilePath = readYamlFileIgnorePostfix(
-        path.join(destinationPath, yaml)
+        path.join(destinationPath, yaml),
       );
       mergeFile(sourceFilePath, targetFilePath);
     }
