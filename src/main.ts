@@ -32,13 +32,13 @@ function readYamlFileIgnorePostfix(
   }
 }
 
-function mergeFile(sourceFilePath: string, targetFilePath: string) {
+async function mergeFile(sourceFilePath: string, targetFilePath: string) {
   // if source file does not exist
   const hasSourceFile = fs.existsSync(sourceFilePath);
   const hasDestinationFile = fs.existsSync(targetFilePath);
   if (hasSourceFile && !hasDestinationFile) {
     // copy source file to destination file
-    io.cp(sourceFilePath, targetFilePath);
+    await io.cp(sourceFilePath, targetFilePath);
     core.info(`Copied ${sourceFilePath} to ${targetFilePath}`);
     return;
   }
@@ -63,16 +63,16 @@ function mergeFile(sourceFilePath: string, targetFilePath: string) {
   }
 }
 
-function mergeDirectory(sourcePath: string, targetPath: string) {
+async function mergeDirectory(sourcePath: string, targetPath: string) {
   // remove files in destination path
-  io.rmRF(targetPath);
+  await io.rmRF(targetPath);
   // copy source path to target path
   const parentPath = path.dirname(targetPath);
-  io.cp(sourcePath, parentPath, { recursive: true, force: true });
+  await io.cp(sourcePath, parentPath, { recursive: true, force: true });
   core.info(`Replace ${targetPath} by ${sourcePath}`);
 }
 
-async function run() {
+async function mergeCharts() {
   const inputs = {
     sourcePath: core.getInput("source-path"),
     destinationPath: core.getInput("destination-path"),
@@ -86,7 +86,7 @@ async function run() {
   const destinationPath = inputs.destinationPath;
   if (fs.existsSync(sourcePath)) {
     for (const directory of inputs.mergeDirectories) {
-      mergeDirectory(
+      await mergeDirectory(
         path.join(sourcePath, directory),
         path.join(destinationPath, directory)
       );
@@ -99,10 +99,18 @@ async function run() {
       const targetFilePath = readYamlFileIgnorePostfix(
         path.join(destinationPath, yaml)
       );
-      mergeFile(sourceFilePath, targetFilePath);
+      await mergeFile(sourceFilePath, targetFilePath);
     }
   } else {
     core.info(`Source path ${sourcePath} does not exist`);
+  }
+}
+
+async function run() {
+  try {
+    await mergeCharts();
+  } catch (error) {
+    core.setFailed(error);
   }
 }
 

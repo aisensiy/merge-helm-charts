@@ -67,44 +67,48 @@ function readYamlFileIgnorePostfix(filePath, ignoreNotFound = true) {
     }
 }
 function mergeFile(sourceFilePath, targetFilePath) {
-    // if source file does not exist
-    const hasSourceFile = fs.existsSync(sourceFilePath);
-    const hasDestinationFile = fs.existsSync(targetFilePath);
-    if (hasSourceFile && !hasDestinationFile) {
-        // copy source file to destination file
-        io.cp(sourceFilePath, targetFilePath);
-        core.info(`Copied ${sourceFilePath} to ${targetFilePath}`);
-        return;
-    }
-    if (!hasSourceFile) {
-        core.info(`Keep ${targetFilePath} unchanged or ignore if not exists`);
-        return;
-    }
-    if (hasSourceFile && hasDestinationFile) {
-        // read source file
-        const sourceFile = fs.readFileSync(sourceFilePath, "utf8");
-        // get lines of source file
-        const sourceLines = sourceFile.split("\n");
-        // read destination file
-        const destinationFile = fs.readFileSync(targetFilePath, "utf8");
-        // get lines of destination file
-        const destinationLines = destinationFile.split("\n");
-        // merge lines
-        const mergedLines = merge_values_by_comments_1.default(sourceLines, destinationLines);
-        // write merged lines to destination file
-        fs.writeFileSync(targetFilePath, `${mergedLines.join("\n").trim()}\n`);
-        core.info(`Merged ${sourceFilePath} to ${targetFilePath}`);
-    }
+    return __awaiter(this, void 0, void 0, function* () {
+        // if source file does not exist
+        const hasSourceFile = fs.existsSync(sourceFilePath);
+        const hasDestinationFile = fs.existsSync(targetFilePath);
+        if (hasSourceFile && !hasDestinationFile) {
+            // copy source file to destination file
+            yield io.cp(sourceFilePath, targetFilePath);
+            core.info(`Copied ${sourceFilePath} to ${targetFilePath}`);
+            return;
+        }
+        if (!hasSourceFile) {
+            core.info(`Keep ${targetFilePath} unchanged or ignore if not exists`);
+            return;
+        }
+        if (hasSourceFile && hasDestinationFile) {
+            // read source file
+            const sourceFile = fs.readFileSync(sourceFilePath, "utf8");
+            // get lines of source file
+            const sourceLines = sourceFile.split("\n");
+            // read destination file
+            const destinationFile = fs.readFileSync(targetFilePath, "utf8");
+            // get lines of destination file
+            const destinationLines = destinationFile.split("\n");
+            // merge lines
+            const mergedLines = merge_values_by_comments_1.default(sourceLines, destinationLines);
+            // write merged lines to destination file
+            fs.writeFileSync(targetFilePath, `${mergedLines.join("\n").trim()}\n`);
+            core.info(`Merged ${sourceFilePath} to ${targetFilePath}`);
+        }
+    });
 }
 function mergeDirectory(sourcePath, targetPath) {
-    // remove files in destination path
-    io.rmRF(targetPath);
-    // copy source path to target path
-    const parentPath = path.dirname(targetPath);
-    io.cp(sourcePath, parentPath, { recursive: true, force: true });
-    core.info(`Replace ${targetPath} by ${sourcePath}`);
+    return __awaiter(this, void 0, void 0, function* () {
+        // remove files in destination path
+        yield io.rmRF(targetPath);
+        // copy source path to target path
+        const parentPath = path.dirname(targetPath);
+        yield io.cp(sourcePath, parentPath, { recursive: true, force: true });
+        core.info(`Replace ${targetPath} by ${sourcePath}`);
+    });
 }
-function run() {
+function mergeCharts() {
     return __awaiter(this, void 0, void 0, function* () {
         const inputs = {
             sourcePath: core.getInput("source-path"),
@@ -118,16 +122,26 @@ function run() {
         const destinationPath = inputs.destinationPath;
         if (fs.existsSync(sourcePath)) {
             for (const directory of inputs.mergeDirectories) {
-                mergeDirectory(path.join(sourcePath, directory), path.join(destinationPath, directory));
+                yield mergeDirectory(path.join(sourcePath, directory), path.join(destinationPath, directory));
             }
             for (const yaml of inputs.mergeYamls) {
                 const sourceFilePath = readYamlFileIgnorePostfix(path.join(sourcePath, yaml));
                 const targetFilePath = readYamlFileIgnorePostfix(path.join(destinationPath, yaml));
-                mergeFile(sourceFilePath, targetFilePath);
+                yield mergeFile(sourceFilePath, targetFilePath);
             }
         }
         else {
             core.info(`Source path ${sourcePath} does not exist`);
+        }
+    });
+}
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield mergeCharts();
+        }
+        catch (error) {
+            core.setFailed(error);
         }
     });
 }
