@@ -1,0 +1,31 @@
+{
+  "root": true,
+  "extends": ["plugin:github/recommended", "plugin:github/typescript"],
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "rules": {
+    "import/no-namespace": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts"],
+      "extends": ["plugin:jest/recommended"],
+      "env": {
+        "jest/globals": true
+      },
+      "rules": {
+        "jest/expect-expect": [
+          "error",
+          {
+            "assertFunctionNames": ["expect", "testMergeStrings"]
+          }
+        ]
+      }
+    }
+  ]
+}

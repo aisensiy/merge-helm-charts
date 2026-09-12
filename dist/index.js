@@ -92,7 +92,7 @@ function mergeFile(sourceFilePath, targetFilePath) {
         // merge lines
         const mergedLines = merge_values_by_comments_1.default(sourceLines, destinationLines);
         // write merged lines to destination file
-        fs.writeFileSync(targetFilePath, mergedLines.join("\n").trim() + "\n");
+        fs.writeFileSync(targetFilePath, `${mergedLines.join("\n").trim()}\n`);
         core.info(`Merged ${sourceFilePath} to ${targetFilePath}`);
     }
 }
